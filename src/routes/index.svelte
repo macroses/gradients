@@ -24,6 +24,8 @@
 	let conicX = "50";
 	let conicY = "50";
 
+	let popup = false;
+
 
 	let colorCollection = [
 		{id: 1, color: getRandomColor(), colorPosition: "", alpha: 1},
@@ -106,13 +108,29 @@
 	};
 
 	function copyCode() {
-		let stringForCopy = document.querySelector('.css_code').innerHTML;
+		let elem = document.querySelector('.css_code');
+		let stringForCopy = elem.innerHTML;
 		navigator.clipboard.writeText(stringForCopy);
+
+		elem.classList.remove('boom');
+
+		popup = true;
+
+		setTimeout(() => {
+			elem.classList.add('boom');
+			popup = false;
+		}, 200);
+
+
 	};
 </script>
 
 <div class="wrapper">
-	<div class="gradient" style="background-image: {defaultType}({defaultDirection}{getColors(colorCollection)})"></div>
+	<div class="gradient" style="background-image: {defaultType}({defaultDirection}{getColors(colorCollection)})">
+		{#if popup}
+			<div class="popup_copied">copied</div>
+		{/if}
+	</div>
 	<div class="settings">
 		<div class="main_settings">
 			<div class="gradient_type">
@@ -132,7 +150,7 @@
 					<div class="manual_inputs">
 						<h5>Degree offset</h5>
 						<input type="range" min="0" max="360" bind:value={degreesValue} on:input={changeGradientDirection(degreesValue)}>
-						<input type="number" bind:value={degreesValue} on:input={changeGradientDirection(degreesValue)}>
+						<input type="number" bind:value={degreesValue} on:input={changeGradientDirection(degreesValue)} min="0" max="360">
 					</div>
 				</div>
 			{/if}
@@ -175,7 +193,7 @@
 								bind:value={item.alpha}
 								on:input={editColor(item.id, item.color, item.alpha)}
 								>
-							<input type="number" bind:value={item.alpha}>
+							<input type="number" bind:value={item.alpha} step="0.01" min="0" max="1">
 						</div>
 						
 						<div class="color_container">
@@ -198,8 +216,7 @@
 				{/each}
 			</div>
 		</div>
-		<div class="css_code" on:click={() => copyCode()}>
-			<h5 style="color: gold">Click to copy</h5>
+		<div class="css_code boom" on:click={() => copyCode()}>	
 			background-image: {defaultType}({defaultDirection}{getColors(colorCollection)});
 		</div>
 	</div>
@@ -276,6 +293,18 @@
 	.gradient {
 		width: 100%;
 		height: 300px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.popup_copied {
+		display: inline-block;
+		background: #131417;
+		color: gold;
+		border-radius: 6px;
+		padding: 5px 10px;
+		transition: .2s;
 	}
 
 	.settings {
@@ -305,13 +334,20 @@
 
 	.css_code {
 		grid-area: code;
-		background: #131417;
+		background: gold;
 		border-radius: 6px;
 		padding: 20px;
-		color: #fff;
+		color: #131417;
 		font-style: italic;
 		cursor: pointer;
 		margin-top: 20px;
+
+		transition: .1s;
+	}
+
+	.css_code.boom {
+		background: #131417;
+		color: #fff;
 	}
 
 	input[type=color] {
@@ -371,4 +407,7 @@
 	.conic_pos h5 {
 		margin-bottom: 10px;
 	}
+
+	
 </style>
+
